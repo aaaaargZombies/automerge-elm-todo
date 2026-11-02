@@ -1,5 +1,17 @@
 import "~/css/style.css";
 import { Elm } from "~/elm/Main.elm";
+import {
+  Repo,
+  BroadcastChannelNetworkAdapter,
+  IndexedDBStorageAdapter,
+} from "@automerge/vanillajs";
+
+const repo = new Repo({
+  network: [new BroadcastChannelNetworkAdapter()],
+  storage: new IndexedDBStorageAdapter(),
+});
+
+window.repo = repo;
 
 const app = Elm.Main.init({
   node: document.querySelector("#elm-app"),
