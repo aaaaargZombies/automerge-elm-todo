@@ -6,6 +6,9 @@ declare module "*.elm" {
           outgoing: {
             subscribe(callback: (data: Outgoing) => void): void;
           };
+          incoming: {
+            send(data: Incomming): void;
+          };
         };
       }
       interface Init {
@@ -19,8 +22,13 @@ declare module "*.elm" {
   };
 }
 
-type Outgoing = { tag: "COUNT"; data: number };
+type Outgoing =
+  | { tag: "GET_TODOS"; data: null }
+  | { tag: "ADD_TODO"; data: null };
+type Incomming = { tag: "SYNCHED_TODOS"; data: readonly Todo[] };
 
 interface Window {
   repo: import("@automerge/vanillajs").Repo;
 }
+
+type Todo = { done: boolean; name: string };

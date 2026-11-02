@@ -4,19 +4,22 @@ import Browser
 import Data exposing (Todo, Todos)
 import Dict
 import Html exposing (Html)
-import Json.Decode exposing (maybe)
+import Json.Decode
+import Json.Encode exposing (Value)
+import Remote exposing (OutMsg(..), PortValue(..))
 import View
 
 
 initialModel : flags -> ( Model, Cmd Msg )
 initialModel _ =
-    ( { todos = Data.emptyTodos }, Cmd.none )
+    ( { todos = Data.emptyTodos }, GetTodos |> Remote.outgoingValue |> Remote.outgoing )
 
 
 type Msg
     = UserToggledDone Int
     | UserUpdatedTodoName Int String
     | UserClickedNewTodo
+    | PortProvidedValue Value
     | NoOp
 
 
@@ -28,39 +31,34 @@ type alias Model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        PortProvidedValue jsonValue ->
+            case Json.Decode.decodeValue Remote.portDecoder jsonValue of
+                Err _ ->
+                    ( model, Cmd.none )
+
+                Ok portValue ->
+                    case portValue of
+                        SynchedTodo todos ->
+                            let
+                                _ =
+                                    Debug.log "PORT TODOS" todos
+                            in
+                            ( { todos = todos }, Cmd.none )
+
         NoOp ->
             ( model, Cmd.none )
 
         UserClickedNewTodo ->
-            ( { model | todos = Data.addTodo (Todo False "") model.todos }, Cmd.none )
+            -- send out to port
+            ( model, AddTodo |> Remote.outgoingValue |> Remote.outgoing )
 
         UserToggledDone id ->
-            let
-                todosItems =
-                    Dict.update id (Maybe.map (\t -> { t | done = not t.done })) model.todos.items
-
-                todos_ =
-                    Todos model.todos.nextId model.todos.title todosItems
-            in
-            ( { model
-                | todos = todos_
-              }
-            , Cmd.none
-            )
+            -- send out to port let
+            ( model, Cmd.none )
 
         UserUpdatedTodoName id name ->
-            let
-                todosItems =
-                    Dict.update id (Maybe.map (\t -> { t | name = name })) model.todos.items
-
-                todos_ =
-                    Todos model.todos.nextId model.todos.title todosItems
-            in
-            ( { model
-                | todos = todos_
-              }
-            , Cmd.none
-            )
+            -- send out to port
+            ( model, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -72,7 +70,7 @@ view { todos } =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Remote.incoming PortProvidedValue
 
 
 main : Program () Model Msg

@@ -1,17 +1,51 @@
-port module Remote exposing (OutMsg(..), outgoing, outgoingValue)
+port module Remote exposing (OutMsg(..), PortValue(..), incoming, outgoing, outgoingValue, portDecoder)
 
+import Data exposing (Todo, Todos)
+import Json.Decode exposing (Decoder)
 import Json.Encode exposing (Value)
 
 
 type OutMsg
-    = Count Int
+    = GetTodos
+    | AddTodo
 
 
 outgoingValue : OutMsg -> { tag : String, data : Value }
 outgoingValue msg =
     case msg of
-        Count n ->
-            { tag = "COUNT", data = Json.Encode.int n }
+        GetTodos ->
+            { tag = "GET_TODOS", data = Json.Encode.null }
+
+        AddTodo ->
+            { tag = "ADD_TODO", data = Json.Encode.null }
 
 
 port outgoing : { tag : String, data : Json.Encode.Value } -> Cmd msg
+
+
+port incoming : (Value -> msg) -> Sub msg
+
+
+type PortValue
+    = SynchedTodo Todos
+
+
+portDecoder : Decoder PortValue
+portDecoder =
+    Json.Decode.field "tag" Json.Decode.string
+        |> Json.Decode.andThen
+            (\tag ->
+                case tag of
+                    "SYNCHED_TODOS" ->
+                        Json.Decode.field "data" todosDecoder
+
+                    other ->
+                        Json.Decode.fail ("Unknown tag: " ++ other)
+            )
+
+
+todosDecoder : Decoder PortValue
+todosDecoder =
+    Json.Decode.array (Json.Decode.map2 Todo (Json.Decode.at [ "done" ] Json.Decode.bool) (Json.Decode.at [ "name" ] Json.Decode.string))
+        |> Json.Decode.map Data.fromArray
+        |> Json.Decode.map SynchedTodo
