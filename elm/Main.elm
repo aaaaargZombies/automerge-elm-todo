@@ -1,24 +1,27 @@
 module Main exposing (main)
 
 import Browser
+import Data exposing (Todo, Todos)
+import Dict
 import Html exposing (Html)
-import Html.Events
-import Remote
+import Json.Decode exposing (maybe)
+import View
 
 
 initialModel : flags -> ( Model, Cmd Msg )
 initialModel _ =
-    ( { count = 1 }, Cmd.none )
+    ( { todos = Data.emptyTodos }, Cmd.none )
 
 
 type Msg
-    = Increment
-    | Decrement
+    = UserToggledDone Int
+    | UserUpdatedTodoName Int String
+    | UserClickedNewTodo
     | NoOp
 
 
 type alias Model =
-    { count : Int
+    { todos : Todos
     }
 
 
@@ -28,29 +31,42 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
-        Increment ->
-            ( { model | count = model.count + 1 }
-            , model.count
-                |> Remote.Count
-                |> Remote.outgoingValue
-                |> Remote.outgoing
+        UserClickedNewTodo ->
+            ( { model | todos = Data.addTodo (Todo False "") model.todos }, Cmd.none )
+
+        UserToggledDone id ->
+            let
+                todosItems =
+                    Dict.update id (Maybe.map (\t -> { t | done = not t.done })) model.todos.items
+
+                todos_ =
+                    Todos model.todos.nextId model.todos.title todosItems
+            in
+            ( { model
+                | todos = todos_
+              }
+            , Cmd.none
             )
 
-        Decrement ->
-            ( { model | count = model.count + 1 }
-            , model.count
-                |> Remote.Count
-                |> Remote.outgoingValue
-                |> Remote.outgoing
+        UserUpdatedTodoName id name ->
+            let
+                todosItems =
+                    Dict.update id (Maybe.map (\t -> { t | name = name })) model.todos.items
+
+                todos_ =
+                    Todos model.todos.nextId model.todos.title todosItems
+            in
+            ( { model
+                | todos = todos_
+              }
+            , Cmd.none
             )
 
 
 view : Model -> Html Msg
-view { count } =
+view { todos } =
     Html.div []
-        [ Html.button [ Html.Events.onClick Increment ] [ Html.text "+1" ]
-        , Html.div [] [ Html.text <| String.fromInt count ]
-        , Html.button [ Html.Events.onClick Decrement ] [ Html.text "-1" ]
+        [ View.todoList { newTodo = UserClickedNewTodo, onClickMsg = UserToggledDone, onInputMsg = UserUpdatedTodoName, todos = todos }
         ]
 
 
