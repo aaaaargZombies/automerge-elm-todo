@@ -17,5 +17,7 @@
     "vite-plugin-elm": "^3.0.1",
     "vitest": "^5.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@automerge/vanillajs": "^2.6.0-alpha.3"
+  }
 }
