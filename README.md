@@ -1,4 +1,6 @@
-# Elm project starter
+# Elm Automerge experiment
+
+Working throughthe [automerge tutorial](https://automerge.org/docs/tutorial/) to see how it integrates with elm instead of react.
 
 ## Development
 
