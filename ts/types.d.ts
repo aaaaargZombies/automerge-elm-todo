@@ -21,12 +21,6 @@ declare module "*.elm" {
 
 type Outgoing = { tag: "COUNT"; data: number };
 
-import { Repo } from "@automerge/vanillajs";
-
-declare global {
-  interface Window {
-    repo: Repo;
-  }
+interface Window {
+  repo: import("@automerge/vanillajs").Repo;
 }
-
-export {};
