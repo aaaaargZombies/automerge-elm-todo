@@ -23,8 +23,11 @@ declare module "*.elm" {
 }
 
 type Outgoing =
+  | { tag: "ADD_TODO"; data: null }
   | { tag: "GET_TODOS"; data: null }
-  | { tag: "ADD_TODO"; data: null };
+  | { tag: "MARK_TODO"; data: number }
+  | { tag: "RENAME_TODO"; data: { id: number; name: string } };
+
 type Incomming = { tag: "SYNCHED_TODOS"; data: readonly Todo[] };
 
 interface Window {

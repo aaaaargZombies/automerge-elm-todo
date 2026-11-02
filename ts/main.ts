@@ -39,6 +39,22 @@ if (app.ports && app.ports.outgoing) {
         handle.change((doc) => doc.todos.unshift({ done: false, name: "" }));
         break;
 
+      case "MARK_TODO":
+        handle.change((doc) => {
+          if (doc.todos[data]) {
+            doc.todos[data].done = !doc.todos[data].done;
+          }
+        });
+        break;
+      case "RENAME_TODO":
+        handle.change((doc) => {
+          const { id, name } = data;
+          if (doc.todos[id]) {
+            doc.todos[id].name = name;
+          }
+        });
+        break;
+
       default:
         never(tag);
         break;

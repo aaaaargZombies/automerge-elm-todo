@@ -12,7 +12,7 @@ import View
 
 initialModel : flags -> ( Model, Cmd Msg )
 initialModel _ =
-    ( { todos = Data.emptyTodos }, GetTodos |> Remote.outgoingValue |> Remote.outgoing )
+    ( { todos = Data.emptyTodos }, Remote.send GetTodos )
 
 
 type Msg
@@ -39,10 +39,6 @@ update msg model =
                 Ok portValue ->
                     case portValue of
                         SynchedTodo todos ->
-                            let
-                                _ =
-                                    Debug.log "PORT TODOS" todos
-                            in
                             ( { todos = todos }, Cmd.none )
 
         NoOp ->
@@ -50,15 +46,15 @@ update msg model =
 
         UserClickedNewTodo ->
             -- send out to port
-            ( model, AddTodo |> Remote.outgoingValue |> Remote.outgoing )
+            ( model, Remote.send AddTodo )
 
         UserToggledDone id ->
             -- send out to port let
-            ( model, Cmd.none )
+            ( model, Remote.send (MarkTodo id) )
 
         UserUpdatedTodoName id name ->
             -- send out to port
-            ( model, Cmd.none )
+            ( model, Remote.send (RenameTodo id name) )
 
 
 view : Model -> Html Msg

@@ -1,4 +1,4 @@
-port module Remote exposing (OutMsg(..), PortValue(..), incoming, outgoing, outgoingValue, portDecoder)
+port module Remote exposing (OutMsg(..), PortValue(..), incoming, outgoing, outgoingValue, portDecoder, send)
 
 import Data exposing (Todo, Todos)
 import Json.Decode exposing (Decoder)
@@ -8,6 +8,8 @@ import Json.Encode exposing (Value)
 type OutMsg
     = GetTodos
     | AddTodo
+    | MarkTodo Int
+    | RenameTodo Int String
 
 
 outgoingValue : OutMsg -> { tag : String, data : Value }
@@ -18,6 +20,19 @@ outgoingValue msg =
 
         AddTodo ->
             { tag = "ADD_TODO", data = Json.Encode.null }
+
+        MarkTodo id ->
+            { tag = "MARK_TODO", data = Json.Encode.int id }
+
+        RenameTodo id name ->
+            { tag = "RENAME_TODO"
+            , data = Json.Encode.object [ ( "id", Json.Encode.int id ), ( "name", Json.Encode.string name ) ]
+            }
+
+
+send : OutMsg -> Cmd msg
+send msg =
+    msg |> outgoingValue |> outgoing
 
 
 port outgoing : { tag : String, data : Json.Encode.Value } -> Cmd msg
