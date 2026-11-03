@@ -7,7 +7,7 @@ import {
 } from "@automerge/vanillajs";
 
 const repo = new Repo({
-  // network: [new BroadcastChannelNetworkAdapter()],
+  network: [new BroadcastChannelNetworkAdapter()],
   // storage: new IndexedDBStorageAdapter(),
 });
 
