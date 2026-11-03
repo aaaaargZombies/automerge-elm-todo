@@ -58,5 +58,11 @@
         "package": "test",
         "version": "2.2.1",
         "sha256": "0rgwwqbnbj61x0c3lvk9d0z2qlw219djkhnc02qygsw9k5599q3v"
+    },
+    {
+        "author": "lydell",
+        "package": "elm-app-url",
+        "version": "1.0.4",
+        "sha256": "1hyhq0vvs9b26vv5gdf7j7hmhxj0zg0dqm95m30i91k8m8wkyhs7"
     }
 ]

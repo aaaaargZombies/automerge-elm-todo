@@ -1,17 +1,18 @@
 module Main exposing (main)
 
-import Browser
-import Data exposing (Todo, Todos)
-import Dict
-import Html exposing (Html)
+import Browser exposing (Document, UrlRequest(..))
+import Browser.Navigation exposing (Key)
+import Data exposing (Todos)
+import Html
 import Json.Decode
 import Json.Encode exposing (Value)
 import Remote exposing (OutMsg(..), PortValue(..))
+import Url exposing (Url)
 import View
 
 
-initialModel : flags -> ( Model, Cmd Msg )
-initialModel _ =
+init : flags -> Url -> Key -> ( Model, Cmd Msg )
+init flags url key =
     ( { todos = Data.emptyTodos }, Remote.send GetTodos )
 
 
@@ -20,6 +21,8 @@ type Msg
     | UserUpdatedTodoName Int String
     | UserClickedNewTodo
     | PortProvidedValue Value
+    | UrlChanged Url
+    | LinkClicked UrlRequest
     | NoOp
 
 
@@ -41,9 +44,6 @@ update msg model =
                         SynchedTodo todos ->
                             ( { todos = todos }, Cmd.none )
 
-        NoOp ->
-            ( model, Cmd.none )
-
         UserClickedNewTodo ->
             -- send out to port
             ( model, Remote.send AddTodo )
@@ -56,11 +56,24 @@ update msg model =
             -- send out to port
             ( model, Remote.send (RenameTodo id name) )
 
+        UrlChanged url ->
+            ( model, Cmd.none )
 
-view : Model -> Html Msg
+        LinkClicked urlRequest ->
+            ( model, Cmd.none )
+
+        NoOp ->
+            ( model, Cmd.none )
+
+
+view : Model -> Document Msg
 view { todos } =
-    Html.div []
-        [ View.todoList { newTodo = UserClickedNewTodo, onClickMsg = UserToggledDone, onInputMsg = UserUpdatedTodoName, todos = todos }
+    Document
+        "Automerged Todos"
+        [ Html.div
+            []
+            [ View.todoList { newTodo = UserClickedNewTodo, onClickMsg = UserToggledDone, onInputMsg = UserUpdatedTodoName, todos = todos }
+            ]
         ]
 
 
@@ -71,9 +84,11 @@ subscriptions _ =
 
 main : Program () Model Msg
 main =
-    Browser.element
-        { init = initialModel
+    Browser.application
+        { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
+        , onUrlRequest = LinkClicked
+        , onUrlChange = UrlChanged
         }
