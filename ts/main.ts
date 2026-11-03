@@ -28,7 +28,6 @@ if (app.ports && app.ports.outgoing) {
   app.ports.outgoing.subscribe(async ({ tag, data }) => {
     switch (tag) {
       case "GET_TODOS":
-        console.log("TODOS PLEASE", handle.doc());
         app.ports.incoming.send({
           tag: "SYNCHED_TODOS",
           data: handle.doc()?.todos || [],
