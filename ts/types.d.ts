@@ -24,11 +24,13 @@ declare module "*.elm" {
 
 type Outgoing =
   | { tag: "ADD_TODO"; data: null }
-  | { tag: "GET_TODOS"; data: null }
+  | { tag: "GET_TODOS"; data: string }
   | { tag: "MARK_TODO"; data: number }
   | { tag: "RENAME_TODO"; data: { id: number; name: string } };
 
-type Incomming = { tag: "SYNCHED_TODOS"; data: readonly Todo[] };
+type Incomming =
+  | { tag: "HANDLE_CHANGED"; data: string }
+  | { tag: "SYNCHED_TODOS"; data: readonly Todo[] };
 
 interface Window {
   repo: import("@automerge/vanillajs").Repo;

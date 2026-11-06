@@ -4,21 +4,36 @@ import {
   Repo,
   BroadcastChannelNetworkAdapter,
   IndexedDBStorageAdapter,
+  isValidAutomergeUrl,
+  DocHandle,
 } from "@automerge/vanillajs";
 
 const repo = new Repo({
   network: [new BroadcastChannelNetworkAdapter()],
-  // storage: new IndexedDBStorageAdapter(),
+  storage: new IndexedDBStorageAdapter(),
 });
 
 window.repo = repo;
 
-const handle = repo.create<{ todos: Todo[] }>({
+// TODO: need to get rid of this useless assignment
+let handle = repo.create<{ todos: Todo[] }>({
   todos: [{ done: false, name: "this is the init value" }],
 });
 
-// temp for messing about in the console
-window.handle = handle;
+const newHandle = () =>
+  repo.create<{ todos: Todo[] }>({
+    todos: [{ done: false, name: "this is the init value" }],
+  });
+
+const getOrCreateHandle = async (
+  url: String,
+): Promise<DocHandle<{ todos: Todo[] }>> => {
+  if (isValidAutomergeUrl(url)) {
+    return repo.find<{ todos: Todo[] }>(url).catch((_) => newHandle());
+  } else {
+    return newHandle();
+  }
+};
 
 const app = Elm.Main.init({
   node: document.querySelector("#elm-app"),
@@ -28,10 +43,26 @@ if (app.ports && app.ports.outgoing) {
   app.ports.outgoing.subscribe(async ({ tag, data }) => {
     switch (tag) {
       case "GET_TODOS":
-        app.ports.incoming.send({
-          tag: "SYNCHED_TODOS",
-          data: handle.doc()?.todos || [],
+        handle = await getOrCreateHandle(data);
+
+        handle.on("change", (evt) => {
+          app.ports.incoming.send({
+            tag: "SYNCHED_TODOS",
+            data: evt.doc?.todos || [],
+          });
         });
+
+        if (handle.url === data) {
+          app.ports.incoming.send({
+            tag: "SYNCHED_TODOS",
+            data: handle.doc()?.todos || [],
+          });
+        } else {
+          app.ports.incoming.send({
+            tag: "HANDLE_CHANGED",
+            data: handle.url,
+          });
+        }
         break;
 
       case "ADD_TODO":
@@ -60,12 +91,5 @@ if (app.ports && app.ports.outgoing) {
     }
   });
 }
-
-handle.on("change", (evt) => {
-  app.ports.incoming.send({
-    tag: "SYNCHED_TODOS",
-    data: evt.doc?.todos || [],
-  });
-});
 
 const never = (_: never) => {};

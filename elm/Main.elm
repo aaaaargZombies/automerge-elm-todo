@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import AppUrl
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation exposing (Key)
 import Data exposing (Todos)
@@ -13,7 +14,12 @@ import View
 
 init : flags -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( { todos = Data.emptyTodos }, Remote.send GetTodos )
+    case (AppUrl.fromUrl url).fragment of
+        Nothing ->
+            ( { key = key, todos = Data.emptyTodos }, Remote.send (GetTodos "") )
+
+        Just fragment ->
+            ( { key = key, todos = Data.emptyTodos }, Remote.send (GetTodos fragment) )
 
 
 type Msg
@@ -28,6 +34,7 @@ type Msg
 
 type alias Model =
     { todos : Todos
+    , key : Browser.Navigation.Key
     }
 
 
@@ -42,7 +49,10 @@ update msg model =
                 Ok portValue ->
                     case portValue of
                         SynchedTodo todos ->
-                            ( { todos = todos }, Cmd.none )
+                            ( { model | todos = todos }, Cmd.none )
+
+                        HandleChanged handle ->
+                            ( model, Browser.Navigation.pushUrl model.key ("#" ++ handle) )
 
         UserClickedNewTodo ->
             -- send out to port
@@ -57,7 +67,19 @@ update msg model =
             ( model, Remote.send (RenameTodo id name) )
 
         UrlChanged url ->
-            ( model, Cmd.none )
+            let
+                appUrl =
+                    AppUrl.fromUrl url
+            in
+            case ( appUrl.path, appUrl.queryParameters, appUrl.fragment ) of
+                ( [], _, Nothing ) ->
+                    ( model, Cmd.none )
+
+                ( [], _, Just fragment ) ->
+                    ( model, Remote.send (GetTodos fragment) )
+
+                _ ->
+                    ( model, Cmd.none )
 
         LinkClicked urlRequest ->
             ( model, Cmd.none )

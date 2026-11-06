@@ -6,7 +6,7 @@ import Json.Encode exposing (Value)
 
 
 type OutMsg
-    = GetTodos
+    = GetTodos String
     | AddTodo
     | MarkTodo Int
     | RenameTodo Int String
@@ -15,8 +15,8 @@ type OutMsg
 outgoingValue : OutMsg -> { tag : String, data : Value }
 outgoingValue msg =
     case msg of
-        GetTodos ->
-            { tag = "GET_TODOS", data = Json.Encode.null }
+        GetTodos automergeUrl ->
+            { tag = "GET_TODOS", data = Json.Encode.string automergeUrl }
 
         AddTodo ->
             { tag = "ADD_TODO", data = Json.Encode.null }
@@ -43,6 +43,7 @@ port incoming : (Value -> msg) -> Sub msg
 
 type PortValue
     = SynchedTodo Todos
+    | HandleChanged String
 
 
 portDecoder : Decoder PortValue
@@ -53,6 +54,10 @@ portDecoder =
                 case tag of
                     "SYNCHED_TODOS" ->
                         Json.Decode.field "data" todosDecoder
+
+                    "HANDLE_CHANGED" ->
+                        Json.Decode.field "data" Json.Decode.string
+                            |> Json.Decode.map HandleChanged
 
                     other ->
                         Json.Decode.fail ("Unknown tag: " ++ other)
