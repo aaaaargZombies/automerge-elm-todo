@@ -76,6 +76,7 @@
                   pkgs.elmPackages.elm-test-rs
                   elm2nix.packages.${system}.default
                   pkgs.nodejs_26
+                  pkgs.typescript
                   perSystem.${system}.prepElmHome
                 ]
                 ++ enabledPackages;
