@@ -12,6 +12,16 @@ git-hooks.lib.${system}.run {
     elm-format.enable = true;
     prettier.enable = true;
 
+    elm = {
+      enable = true;
+      name = "elm";
+      description = "Compile the elm project";
+      language = "system";
+      files = "\\.elm$";
+      pass_filenames = false;
+      entry = "${pkgs.elmPackages.elm}/bin/elm make --optimize  --output=elm-stuff/elm.js  elm/Main.elm";
+    };
+
     elm-test-rs = {
       enable = true;
       name = "elm-test-rs";
