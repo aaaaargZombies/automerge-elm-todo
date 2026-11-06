@@ -42,6 +42,16 @@ git-hooks.lib.${system}.run {
       entry = "${elm2nix}/bin/elm2nix lock";
     };
 
+    ts-check = {
+      enable = true;
+      name = "ts-check";
+      description = "typecheck TS code";
+      language = "system";
+      files = "\\.ts$";
+      pass_filenames = false;
+      entry = "${pkgs.typescript}/bin/tsc --noEmit";
+    };
+
     ts-test = {
       enable = true;
       name = "ts-test";
