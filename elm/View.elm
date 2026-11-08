@@ -18,7 +18,7 @@ todo { onClickMsg, onInputMsg, done, name, id } =
             ]
             []
         , Html.input
-            [ Html.Attributes.type_ "input"
+            [ Html.Attributes.type_ "text"
             , Html.Events.onInput (onInputMsg id)
             , Html.Attributes.value name
             , Html.Attributes.placeholder "What needs doing?"
