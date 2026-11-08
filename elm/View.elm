@@ -17,11 +17,10 @@ todo { onClickMsg, onInputMsg, done, name, id } =
             , Html.Events.onClick (onClickMsg id)
             ]
             []
-        , Html.input
-            [ Html.Attributes.type_ "text"
-            , Html.Events.onInput (onInputMsg id)
-            , Html.Attributes.value name
-            , Html.Attributes.placeholder "What needs doing?"
+        , Html.node "caret-preserver"
+            [ Html.Events.onInput (onInputMsg id)
+            , Html.Attributes.attribute "value" name
+            , Html.Attributes.attribute "placeholder" "What needs doing?"
             ]
             []
         ]

@@ -7,6 +7,9 @@ import {
   isValidAutomergeUrl,
   DocHandle,
 } from "@automerge/vanillajs";
+import { CaretPreserver } from "./caretPreserver";
+
+window.customElements.define("caret-preserver", CaretPreserver);
 
 const repo = new Repo({
   network: [new BroadcastChannelNetworkAdapter()],
