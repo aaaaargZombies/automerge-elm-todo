@@ -47,13 +47,19 @@ elm-test-rs
 
 #### What it's for
 
-- `flake.nix` manages production builds and development environment
-- `elm.json` for elm packages used for site
-- `package.json` for node scripts and packages
-- `package-lock.json` for current versions of node packages
-- `vite.config.ts` for build config
-- `tests/*` contains test files
-- `elm/*` contains app Elm source files
-- `ts/*` contains app Typescript source files
 - `css/*` contains app CSS source files
+- `elm.json` for Elm packages used for site
+- `elm.lock` for Elm package hashes used by nix to build project
+- `elm/*` contains app Elm source files
+- `flake.lock` nix package hashes for reproducability
+- `flake.nix` manages production builds and development environment
+- `index.html` route of the served website
 - `nix/*` contains Nix code for building the Elm app and patching the virtual dom
+- `package-lock.json` for current versions of node packages
+- `package.json` for Node scripts and packages
+- `public/*` static assets
+- `result/share/*` the location that `nix build` builds into
+- `tests/*` contains Elm test files
+- `ts/*` contains app Typescript source and test files
+- `tsconfig.json` Typescript compile options
+- `vite.config.ts` for build config
