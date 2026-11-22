@@ -32,8 +32,4 @@ type Incomming =
   | { tag: "HANDLE_CHANGED"; data: string }
   | { tag: "SYNCHED_TODOS"; data: readonly Todo[] };
 
-interface Window {
-  repo: import("@automerge/vanillajs").Repo;
-}
-
 type Todo = { done: boolean; name: string };

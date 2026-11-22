@@ -8,6 +8,14 @@ import {
   DocHandle,
 } from "@automerge/vanillajs";
 import { CaretPreserver } from "./caretPreserver";
+import type { RootDocument } from "./rootDoc";
+
+declare global {
+  interface Window {
+    repo: Repo;
+    handle: DocHandle<RootDocument>;
+  }
+}
 
 window.customElements.define("caret-preserver", CaretPreserver);
 
