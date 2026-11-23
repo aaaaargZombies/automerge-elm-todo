@@ -14,7 +14,7 @@
     "@hegeldev/hegel": "^0.4.5",
     "typescript": "^7.0.2",
     "vite": "^8.2.2",
-    "vite-plugin-elm": "^3.0.1",
+    "vite-plugin-elm": "^4.0.0",
     "vite-plugin-wasm": "^3.6.0",
     "vitest": "^5.0.0"
   },
