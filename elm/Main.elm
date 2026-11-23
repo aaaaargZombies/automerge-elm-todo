@@ -4,6 +4,7 @@ import AppUrl
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation exposing (Key)
 import Data exposing (Todos)
+import Dict exposing (Dict)
 import Html
 import Json.Decode
 import Json.Encode exposing (Value)
@@ -14,12 +15,16 @@ import View
 
 init : flags -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
+    let
+        initialModel =
+            { key = key, todoLists = Dict.empty, currentList = Nothing }
+    in
     case (AppUrl.fromUrl url).fragment of
         Nothing ->
-            ( { key = key, todos = Data.emptyTodos }, Remote.send (GetTodos "") )
+            ( initialModel, Remote.send (GetTodos "") )
 
         Just fragment ->
-            ( { key = key, todos = Data.emptyTodos }, Remote.send (GetTodos fragment) )
+            ( { initialModel | currentList = Just fragment }, Remote.send (GetTodos fragment) )
 
 
 type Msg
@@ -33,7 +38,8 @@ type Msg
 
 
 type alias Model =
-    { todos : Todos
+    { todoLists : Dict String Todos
+    , currentList : Maybe String
     , key : Browser.Navigation.Key
     }
 
@@ -49,7 +55,13 @@ update msg model =
                 Ok portValue ->
                     case portValue of
                         SynchedTodo todos ->
-                            ( { model | todos = todos }, Cmd.none )
+                            let
+                                lists =
+                                    model.currentList
+                                        |> Maybe.map (\key -> Dict.update key (always (Just todos)) model.todoLists)
+                                        |> Maybe.withDefault model.todoLists
+                            in
+                            ( { model | todoLists = lists }, Cmd.none )
 
                         HandleChanged handle ->
                             ( model, Browser.Navigation.pushUrl model.key ("#" ++ handle) )
@@ -76,7 +88,7 @@ update msg model =
                     ( model, Cmd.none )
 
                 ( [], _, Just fragment ) ->
-                    ( model, Remote.send (GetTodos fragment) )
+                    ( { model | currentList = Just fragment }, Remote.send (GetTodos fragment) )
 
                 _ ->
                     ( model, Cmd.none )
@@ -89,7 +101,13 @@ update msg model =
 
 
 view : Model -> Document Msg
-view { todos } =
+view model =
+    let
+        todos =
+            model.currentList
+                |> Maybe.andThen (\key -> Dict.get key model.todoLists)
+                |> Maybe.withDefault Data.emptyTodos
+    in
     Document
         "Automerged Todos"
         [ Html.div
