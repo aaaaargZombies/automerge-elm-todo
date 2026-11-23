@@ -26,15 +26,14 @@ const repo = new Repo({
 
 window.repo = repo;
 
-// TODO: need to get rid of this useless assignment
-let handle = repo.create<{ todos: Todo[] }>({
-  todos: [{ done: false, name: "this is the init value" }],
-});
-
 const newHandle = () =>
   repo.create<{ todos: Todo[] }>({
     todos: [{ done: false, name: "this is the init value" }],
   });
+
+// TODO: need to get rid of this useless assignment
+// only there so types are happy
+let handle = newHandle();
 
 const getOrCreateHandle = async (
   url: String,
