@@ -31,6 +31,7 @@ type Msg
     = UserToggledDone Int
     | UserUpdatedTodoName Int String
     | UserClickedNewTodo
+    | UserClickedNewTodoList
     | PortProvidedValue Value
     | UrlChanged Url
     | LinkClicked UrlRequest
@@ -68,6 +69,10 @@ update msg model =
             -- send out to port
             ( model, Remote.send AddTodo )
 
+        UserClickedNewTodoList ->
+            -- send out to port
+            ( model, Remote.send AddTodoList )
+
         UserToggledDone id ->
             -- send out to port let
             ( model, Remote.send (MarkTodo id) )
@@ -92,7 +97,16 @@ update msg model =
                     ( model, Cmd.none )
 
         LinkClicked urlRequest ->
-            ( model, Cmd.none )
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model
+                    , Browser.Navigation.pushUrl model.key (Url.toString url)
+                    )
+
+                Browser.External href ->
+                    ( model
+                    , Browser.Navigation.load href
+                    )
 
         NoOp ->
             ( model, Cmd.none )
@@ -110,7 +124,7 @@ view model =
         "Automerged Todos"
         [ Html.div
             []
-            [ View.todoListList { todoLists = model.todoLists, currentList = model.currentList }
+            [ View.todoListList { todoLists = model.todoLists, currentList = model.currentList, newList = UserClickedNewTodoList }
             , View.todoList { newTodo = UserClickedNewTodo, onClickMsg = UserToggledDone, onInputMsg = UserUpdatedTodoName, todos = todos }
             ]
         ]

@@ -24,6 +24,7 @@ declare module "*.elm" {
 
 type Outgoing =
   | { tag: "ADD_TODO"; data: null }
+  | { tag: "ADD_TODO_LIST"; data: null }
   | { tag: "GET_TODOS"; data: string }
   | { tag: "MARK_TODO"; data: number }
   | { tag: "RENAME_TODO"; data: { id: number; name: string } };

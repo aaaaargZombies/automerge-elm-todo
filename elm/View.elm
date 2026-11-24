@@ -39,8 +39,8 @@ todoList { onClickMsg, onInputMsg, newTodo, todos } =
         ]
 
 
-todoListList : { todoLists : Dict String Todos, currentList : Maybe String } -> Html msg
-todoListList { todoLists, currentList } =
+todoListList : { todoLists : Dict String Todos, currentList : Maybe String, newList : msg } -> Html msg
+todoListList { todoLists, currentList, newList } =
     let
         isCurrent : String -> String
         isCurrent autoUrl =
@@ -54,13 +54,22 @@ todoListList { todoLists, currentList } =
                             "false"
                     )
                 |> Maybe.withDefault "false"
+
+        lists =
+            todoLists
+                |> Dict.toList
+                |> List.map
+                    (\( automergeUrl, todoVal ) ->
+                        Html.li
+                            [ Html.Attributes.attribute "aria-current" (isCurrent automergeUrl) ]
+                            [ Html.a [ Html.Attributes.href ("#" ++ automergeUrl) ] [ Html.text todoVal.title ] ]
+                    )
+                |> Html.ul []
+
+        addListBtn =
+            Html.button [ Html.Events.onClick newList ] [ Html.text "+ List" ]
     in
-    todoLists
-        |> Dict.toList
-        |> List.map
-            (\( automergeUrl, todoVal ) ->
-                Html.li
-                    [ Html.Attributes.attribute "aria-current" (isCurrent automergeUrl) ]
-                    [ Html.a [ Html.Attributes.href ("#" ++ automergeUrl) ] [ Html.text todoVal.title ] ]
-            )
-        |> Html.ul []
+    Html.div []
+        [ addListBtn
+        , lists
+        ]

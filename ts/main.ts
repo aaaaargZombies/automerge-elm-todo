@@ -51,6 +51,22 @@ const app = Elm.Main.init({
 if (app.ports && app.ports.outgoing) {
   app.ports.outgoing.subscribe(async ({ tag, data }) => {
     switch (tag) {
+      case "ADD_TODO_LIST":
+        handle = await getOrCreateHandle("");
+
+        handle.on("change", (_event) => {
+          app.ports.incoming.send({
+            tag: "SYNCHED_TODOS",
+            data: [handle.url, handle.doc()!],
+          });
+        });
+
+        app.ports.incoming.send({
+          tag: "SYNCHED_TODOS",
+          data: [handle.url, handle.doc()!],
+        });
+        break;
+
       case "GET_TODOS":
         handle = await getOrCreateHandle(data);
 

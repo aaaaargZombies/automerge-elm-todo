@@ -10,6 +10,7 @@ type OutMsg
     | AddTodo
     | MarkTodo Int
     | RenameTodo Int String
+    | AddTodoList
 
 
 outgoingValue : OutMsg -> { tag : String, data : Value }
@@ -20,6 +21,9 @@ outgoingValue msg =
 
         AddTodo ->
             { tag = "ADD_TODO", data = Json.Encode.null }
+
+        AddTodoList ->
+            { tag = "ADD_TODO_LIST", data = Json.Encode.null }
 
         MarkTodo id ->
             { tag = "MARK_TODO", data = Json.Encode.int id }
