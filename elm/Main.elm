@@ -66,19 +66,15 @@ update msg model =
                             ( model, Browser.Navigation.pushUrl model.key ("#" ++ handle) )
 
         UserClickedNewTodo ->
-            -- send out to port
             ( model, Remote.send AddTodo )
 
         UserClickedNewTodoList ->
-            -- send out to port
             ( model, Remote.send AddTodoList )
 
         UserToggledDone id ->
-            -- send out to port let
             ( model, Remote.send (MarkTodo id) )
 
         UserUpdatedTodoName id name ->
-            -- send out to port
             ( model, Remote.send (RenameTodo id name) )
 
         UrlChanged url ->
