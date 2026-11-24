@@ -48,7 +48,7 @@ todoListList { todoLists, currentList } =
                 |> Maybe.map
                     (\current ->
                         if current == autoUrl then
-                            "True"
+                            "true"
 
                         else
                             "false"
