@@ -112,7 +112,8 @@ view model =
         "Automerged Todos"
         [ Html.div
             []
-            [ View.todoList { newTodo = UserClickedNewTodo, onClickMsg = UserToggledDone, onInputMsg = UserUpdatedTodoName, todos = todos }
+            [ View.todoListList { todoLists = model.todoLists, currentList = model.currentList }
+            , View.todoList { newTodo = UserClickedNewTodo, onClickMsg = UserToggledDone, onInputMsg = UserUpdatedTodoName, todos = todos }
             ]
         ]
 

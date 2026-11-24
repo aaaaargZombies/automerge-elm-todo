@@ -1,6 +1,6 @@
 module View exposing (..)
 
-import Data exposing (Todo, Todos)
+import Data exposing (Todos)
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes
@@ -37,3 +37,30 @@ todoList { onClickMsg, onInputMsg, newTodo, todos } =
             |> List.map (\( k, v ) -> todo { onClickMsg = onClickMsg, onInputMsg = onInputMsg, done = v.done, name = v.name, id = k })
             |> Html.ul []
         ]
+
+
+todoListList : { todoLists : Dict String Todos, currentList : Maybe String } -> Html msg
+todoListList { todoLists, currentList } =
+    let
+        isCurrent : String -> String
+        isCurrent autoUrl =
+            currentList
+                |> Maybe.map
+                    (\current ->
+                        if current == autoUrl then
+                            "True"
+
+                        else
+                            "false"
+                    )
+                |> Maybe.withDefault "false"
+    in
+    todoLists
+        |> Dict.toList
+        |> List.map
+            (\( automergeUrl, todoVal ) ->
+                Html.li
+                    [ Html.Attributes.attribute "aria-current" (isCurrent automergeUrl) ]
+                    [ Html.a [ Html.Attributes.href ("#" ++ automergeUrl) ] [ Html.text todoVal.title ] ]
+            )
+        |> Html.ul []
