@@ -48,6 +48,18 @@ type alias Model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        UserClickedNewTodo ->
+            ( model, Remote.send AddTodo )
+
+        UserClickedNewTodoList ->
+            ( model, Remote.send AddTodoList )
+
+        UserToggledDone id ->
+            ( model, Remote.send (MarkTodo id) )
+
+        UserUpdatedTodoName id name ->
+            ( model, Remote.send (RenameTodo id name) )
+
         PortProvidedValue jsonValue ->
             case Json.Decode.decodeValue Remote.portDecoder jsonValue of
                 Err _ ->
@@ -64,18 +76,6 @@ update msg model =
 
                         HandleChanged handle ->
                             ( model, Browser.Navigation.pushUrl model.key ("#" ++ handle) )
-
-        UserClickedNewTodo ->
-            ( model, Remote.send AddTodo )
-
-        UserClickedNewTodoList ->
-            ( model, Remote.send AddTodoList )
-
-        UserToggledDone id ->
-            ( model, Remote.send (MarkTodo id) )
-
-        UserUpdatedTodoName id name ->
-            ( model, Remote.send (RenameTodo id name) )
 
         UrlChanged url ->
             let
