@@ -33,9 +33,9 @@ withTitle title todos =
     { todos | title = title }
 
 
-fromArray : Array Todo -> Todos
-fromArray todoArray =
+fromArray : String -> Array Todo -> Todos
+fromArray title todoArray =
     todoArray
         |> Array.toIndexedList
         |> Dict.fromList
-        |> Todos ""
+        |> Todos title

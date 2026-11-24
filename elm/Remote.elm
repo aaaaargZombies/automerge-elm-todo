@@ -66,6 +66,9 @@ portDecoder =
 
 todosDecoder : Decoder PortValue
 todosDecoder =
-    Json.Decode.array (Json.Decode.map2 Todo (Json.Decode.at [ "done" ] Json.Decode.bool) (Json.Decode.at [ "name" ] Json.Decode.string))
-        |> Json.Decode.map Data.fromArray
+    Json.Decode.map2 Data.fromArray
+        (Json.Decode.field "title" Json.Decode.string)
+        (Json.Decode.field "items"
+            (Json.Decode.array (Json.Decode.map2 Todo (Json.Decode.field "done" Json.Decode.bool) (Json.Decode.field "name" Json.Decode.string)))
+        )
         |> Json.Decode.map SynchedTodo

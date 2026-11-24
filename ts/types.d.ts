@@ -30,6 +30,11 @@ type Outgoing =
 
 type Incomming =
   | { tag: "HANDLE_CHANGED"; data: string }
-  | { tag: "SYNCHED_TODOS"; data: readonly Todo[] };
+  | { tag: "SYNCHED_TODOS"; data: Todos };
 
 type Todo = { done: boolean; name: string };
+
+type Todos = {
+  title: string;
+  items: Todo[];
+};

@@ -27,19 +27,18 @@ const repo = new Repo({
 window.repo = repo;
 
 const newHandle = () =>
-  repo.create<{ todos: Todo[] }>({
-    todos: [{ done: false, name: "this is the init value" }],
+  repo.create<Todos>({
+    title: `tasks-${Date.now()}`,
+    items: [{ done: false, name: "this is the init value" }],
   });
 
 // TODO: need to get rid of this useless assignment
 // only there so types are happy
 let handle = newHandle();
 
-const getOrCreateHandle = async (
-  url: String,
-): Promise<DocHandle<{ todos: Todo[] }>> => {
+const getOrCreateHandle = async (url: String): Promise<DocHandle<Todos>> => {
   if (isValidAutomergeUrl(url)) {
-    return repo.find<{ todos: Todo[] }>(url).catch((_) => newHandle());
+    return repo.find<Todos>(url).catch((_) => newHandle());
   } else {
     return newHandle();
   }
@@ -55,17 +54,17 @@ if (app.ports && app.ports.outgoing) {
       case "GET_TODOS":
         handle = await getOrCreateHandle(data);
 
-        handle.on("change", (evt) => {
+        handle.on("change", (_event) => {
           app.ports.incoming.send({
             tag: "SYNCHED_TODOS",
-            data: evt.doc?.todos || [],
+            data: handle.doc()!,
           });
         });
 
         if (handle.url === data) {
           app.ports.incoming.send({
             tag: "SYNCHED_TODOS",
-            data: handle.doc()?.todos || [],
+            data: handle.doc()!,
           });
         } else {
           app.ports.incoming.send({
@@ -76,21 +75,21 @@ if (app.ports && app.ports.outgoing) {
         break;
 
       case "ADD_TODO":
-        handle.change((doc) => doc.todos.unshift({ done: false, name: "" }));
+        handle.change((doc) => doc.items.unshift({ done: false, name: "" }));
         break;
 
       case "MARK_TODO":
         handle.change((doc) => {
-          if (doc.todos[data]) {
-            doc.todos[data].done = !doc.todos[data].done;
+          if (doc.items[data]) {
+            doc.items[data].done = !doc.items[data].done;
           }
         });
         break;
       case "RENAME_TODO":
         handle.change((doc) => {
           const { id, name } = data;
-          if (doc.todos[id]) {
-            doc.todos[id].name = name;
+          if (doc.items[id]) {
+            doc.items[id].name = name;
           }
         });
         break;
