@@ -54,12 +54,10 @@ update msg model =
 
                 Ok portValue ->
                     case portValue of
-                        SynchedTodo todos ->
+                        SynchedTodo ( automergeUrl, todos ) ->
                             let
                                 lists =
-                                    model.currentList
-                                        |> Maybe.map (\key -> Dict.update key (always (Just todos)) model.todoLists)
-                                        |> Maybe.withDefault model.todoLists
+                                    Dict.update automergeUrl (always (Just todos)) model.todoLists
                             in
                             ( { model | todoLists = lists }, Cmd.none )
 

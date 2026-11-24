@@ -30,7 +30,7 @@ type Outgoing =
 
 type Incomming =
   | { tag: "HANDLE_CHANGED"; data: string }
-  | { tag: "SYNCHED_TODOS"; data: Todos };
+  | { tag: "SYNCHED_TODOS"; data: [string, Todos] };
 
 type Todo = { done: boolean; name: string };
 

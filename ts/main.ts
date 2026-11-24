@@ -57,14 +57,14 @@ if (app.ports && app.ports.outgoing) {
         handle.on("change", (_event) => {
           app.ports.incoming.send({
             tag: "SYNCHED_TODOS",
-            data: handle.doc()!,
+            data: [handle.url, handle.doc()!],
           });
         });
 
         if (handle.url === data) {
           app.ports.incoming.send({
             tag: "SYNCHED_TODOS",
-            data: handle.doc()!,
+            data: [handle.url, handle.doc()!],
           });
         } else {
           app.ports.incoming.send({
