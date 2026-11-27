@@ -12,7 +12,10 @@ declare module "*.elm" {
         };
       }
       interface Init {
-        init(options: { node: HTMLElement | null }): App;
+        init(options: {
+          node: HTMLElement | null;
+          flags: [string, Todos][];
+        }): App;
       }
     }
   }

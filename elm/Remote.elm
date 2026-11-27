@@ -1,6 +1,7 @@
-port module Remote exposing (OutMsg(..), PortValue(..), incoming, outgoing, outgoingValue, portDecoder, send)
+port module Remote exposing (OutMsg(..), PortValue(..), flagsDecoder, incoming, outgoing, outgoingValue, portDecoder, send)
 
 import Data exposing (Todo, Todos)
+import Dict exposing (Dict)
 import Json.Decode exposing (Decoder)
 import Json.Encode exposing (Value)
 
@@ -81,3 +82,20 @@ todosDecoder =
             )
         )
         |> Json.Decode.map SynchedTodo
+
+
+flagsDecoder : Decoder (Dict String Todos)
+flagsDecoder =
+    Json.Decode.list
+        (Json.Decode.map2 Tuple.pair
+            (Json.Decode.index 0 Json.Decode.string)
+            (Json.Decode.index 1
+                (Json.Decode.map2 Data.fromArray
+                    (Json.Decode.field "title" Json.Decode.string)
+                    (Json.Decode.field "items"
+                        (Json.Decode.array (Json.Decode.map2 Todo (Json.Decode.field "done" Json.Decode.bool) (Json.Decode.field "name" Json.Decode.string)))
+                    )
+                )
+            )
+        )
+        |> Json.Decode.map Dict.fromList

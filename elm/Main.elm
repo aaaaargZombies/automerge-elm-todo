@@ -13,11 +13,16 @@ import Url exposing (Url)
 import View
 
 
-init : flags -> Url -> Key -> ( Model, Cmd Msg )
+init : Value -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
     let
+        todoLists : Dict String Todos
+        todoLists =
+            Json.Decode.decodeValue Remote.flagsDecoder flags
+                |> Result.withDefault Dict.empty
+
         initialModel =
-            { key = key, todoLists = Dict.empty, currentList = Nothing }
+            { key = key, todoLists = todoLists, currentList = Nothing }
     in
     case (AppUrl.fromUrl url).fragment of
         Nothing ->
@@ -131,7 +136,7 @@ subscriptions _ =
     Remote.incoming PortProvidedValue
 
 
-main : Program () Model Msg
+main : Program Value Model Msg
 main =
     Browser.application
         { init = init

@@ -46,6 +46,7 @@ const getOrCreateHandle = async (url: String): Promise<DocHandle<Todos>> => {
 
 const app = Elm.Main.init({
   node: document.querySelector("#elm-app"),
+  flags: [],
 });
 
 if (app.ports && app.ports.outgoing) {
