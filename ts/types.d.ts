@@ -26,11 +26,11 @@ declare module "*.elm" {
 }
 
 type Outgoing =
-  | { tag: "ADD_TODO"; data: null }
   | { tag: "ADD_TODO_LIST"; data: null }
+  | { tag: "ADD_TODO"; data: string }
   | { tag: "GET_TODOS"; data: string }
-  | { tag: "MARK_TODO"; data: number }
-  | { tag: "RENAME_TODO"; data: { id: number; name: string } };
+  | { tag: "MARK_TODO"; data: { url: string; id: number } }
+  | { tag: "RENAME_TODO"; data: { url: string; id: number; name: string } };
 
 type Incomming =
   | { tag: "HANDLE_CHANGED"; data: string }

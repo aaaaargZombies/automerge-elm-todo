@@ -33,9 +33,9 @@ init flags url key =
 
 
 type Msg
-    = UserToggledDone Int
-    | UserUpdatedTodoName Int String
-    | UserClickedNewTodo
+    = UserToggledDone String Int
+    | UserUpdatedTodoName String Int String
+    | UserClickedNewTodo String
     | UserClickedNewTodoList
     | PortProvidedValue Value
     | UrlChanged Url
@@ -53,17 +53,17 @@ type alias Model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UserClickedNewTodo ->
-            ( model, Remote.send AddTodo )
+        UserClickedNewTodo automergeUrl ->
+            ( model, Remote.send (AddTodo automergeUrl) )
 
         UserClickedNewTodoList ->
             ( model, Remote.send AddTodoList )
 
-        UserToggledDone id ->
-            ( model, Remote.send (MarkTodo id) )
+        UserToggledDone automergeUrl id ->
+            ( model, Remote.send (MarkTodo automergeUrl id) )
 
-        UserUpdatedTodoName id name ->
-            ( model, Remote.send (RenameTodo id name) )
+        UserUpdatedTodoName automergeUrl id name ->
+            ( model, Remote.send (RenameTodo automergeUrl id name) )
 
         PortProvidedValue jsonValue ->
             case Json.Decode.decodeValue Remote.portDecoder jsonValue of
@@ -120,13 +120,16 @@ view model =
             model.currentList
                 |> Maybe.andThen (\key -> Dict.get key model.todoLists)
                 |> Maybe.withDefault Data.emptyTodos
+
+        url =
+            Maybe.withDefault "" model.currentList
     in
     Document
         "Automerged Todos"
         [ Html.div
             []
             [ View.todoListList { todoLists = model.todoLists, currentList = model.currentList, newList = UserClickedNewTodoList }
-            , View.todoList { newTodo = UserClickedNewTodo, onClickMsg = UserToggledDone, onInputMsg = UserUpdatedTodoName, todos = todos }
+            , View.todoList { newTodo = UserClickedNewTodo url, onClickMsg = UserToggledDone url, onInputMsg = UserUpdatedTodoName url, todos = todos }
             ]
         ]
 

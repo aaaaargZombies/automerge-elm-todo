@@ -8,9 +8,9 @@ import Json.Encode exposing (Value)
 
 type OutMsg
     = GetTodos String
-    | AddTodo
-    | MarkTodo Int
-    | RenameTodo Int String
+    | AddTodo String
+    | MarkTodo String Int
+    | RenameTodo String Int String
     | AddTodoList
 
 
@@ -20,18 +20,20 @@ outgoingValue msg =
         GetTodos automergeUrl ->
             { tag = "GET_TODOS", data = Json.Encode.string automergeUrl }
 
-        AddTodo ->
-            { tag = "ADD_TODO", data = Json.Encode.null }
+        AddTodo automergeUrl ->
+            { tag = "ADD_TODO", data = Json.Encode.string automergeUrl }
 
         AddTodoList ->
             { tag = "ADD_TODO_LIST", data = Json.Encode.null }
 
-        MarkTodo id ->
-            { tag = "MARK_TODO", data = Json.Encode.int id }
+        MarkTodo automergeUrl id ->
+            { tag = "MARK_TODO"
+            , data = Json.Encode.object [ ( "url", Json.Encode.string automergeUrl ), ( "id", Json.Encode.int id ) ]
+            }
 
-        RenameTodo id name ->
+        RenameTodo automergeUrl id name ->
             { tag = "RENAME_TODO"
-            , data = Json.Encode.object [ ( "id", Json.Encode.int id ), ( "name", Json.Encode.string name ) ]
+            , data = Json.Encode.object [ ( "url", Json.Encode.string automergeUrl ), ( "id", Json.Encode.int id ), ( "name", Json.Encode.string name ) ]
             }
 
 
