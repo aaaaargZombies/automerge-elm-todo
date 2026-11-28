@@ -74,7 +74,6 @@ if (app.ports && app.ports.outgoing) {
         (async () => {
           const handle = todoLists.get(await getOrCreateHandle(""));
 
-          // FIX: why no persist
           window.handle.change(({ taskLists }) => {
             taskLists.push(handle!.url);
           });
